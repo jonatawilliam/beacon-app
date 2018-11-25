@@ -1,5 +1,5 @@
 import { Component } from '@angular/core';
-import { NavController } from 'ionic-angular';
+import { NavController, Platform } from 'ionic-angular';
 
 import { IBeacon, IBeaconPluginResult } from '@ionic-native/ibeacon';
 
@@ -20,34 +20,37 @@ export class HomePage {
   private beacon2Fired = false;
 
   constructor(
+    private platform: Platform,
     private navCcntroller: NavController,
     private ibeacon: IBeacon,
   ) {
-    // Request permission to use location on iOS
-    this.ibeacon.requestAlwaysAuthorization();
-    // create a new delegate and register it with the native layer
-    let delegate = this.ibeacon.Delegate();
+    this.platform.ready().then(() => {
+      // Request permission to use location on iOS
+      this.ibeacon.requestAlwaysAuthorization();
+      // create a new delegate and register it with the native layer
+      let delegate = this.ibeacon.Delegate();
 
-    delegate.didEnterRegion()
-      .subscribe(
-        beacon => this.handleBeacon(beacon),
-        error => console.error('didEnterRegion', error)
+      delegate.didEnterRegion()
+        .subscribe(
+          beacon => this.handleBeacon(beacon),
+          error => console.error('didEnterRegion', error)
+        );
+
+      const beacon1 = this.ibeacon.BeaconRegion(
+        HomePage.BEACON_1,
+        HomePage.BEACONS_UUID,
+        5780
       );
 
-    const beacon1 = this.ibeacon.BeaconRegion(
-      HomePage.BEACON_1,
-      HomePage.BEACONS_UUID,
-      5780
-    );
+      const beacon2 = this.ibeacon.BeaconRegion(
+        HomePage.BEACON_2,
+        HomePage.BEACONS_UUID,
+        5687
+      );
 
-    const beacon2 = this.ibeacon.BeaconRegion(
-      HomePage.BEACON_2,
-      HomePage.BEACONS_UUID,
-      5687
-    );
-
-    this.ibeacon.startMonitoringForRegion(beacon1);
-    this.ibeacon.startMonitoringForRegion(beacon2);
+      this.ibeacon.startMonitoringForRegion(beacon1);
+      this.ibeacon.startMonitoringForRegion(beacon2);
+    });
   }
 
   private handleBeacon(beacon: IBeaconPluginResult) {
