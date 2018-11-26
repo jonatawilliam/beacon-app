@@ -8,14 +8,13 @@
 
 <ion-content>
   <ion-card>
-    <img src="assets/imgs/bike.jpg"/>
+    <img *ngIf="image" [src]="image"/>
     <ion-card-content>
       <ion-card-title>
-        Bike Incrivel
+        {{ title }}
         </ion-card-title>
       <p>
-        Promoçao especial, para um cliente especial,
-        só a metade do dobro.
+        {{ text }}
       </p>
     </ion-card-content>
   </ion-card>

@@ -1,4 +1,5 @@
 import { Component } from '@angular/core';
+import { HttpClient } from '@angular/common/http';
 import { NavController, Platform } from 'ionic-angular';
 
 import { IBeacon, IBeaconPluginResult } from '@ionic-native/ibeacon';
@@ -23,6 +24,7 @@ export class HomePage {
     private platform: Platform,
     private navCcntroller: NavController,
     private ibeacon: IBeacon,
+    private http: HttpClient
   ) {
     this.platform.ready().then(() => {
       // Request permission to use location on iOS
@@ -72,13 +74,16 @@ export class HomePage {
     if (this.beacon1Fired) return;
 
     this.beacon1Fired = true;
-    cordova.plugins.notification.local.schedule({
-      title: 'Promoçao time do coraçao.',
-      text: 'Use o código TIME15 para comprar'
-            + ' uma camisa do seu time do coraçao'
-            + ' com 15% de desconto',
-      foreground: true
-    });
+    this.http.get("http://beacon-server-distribuited.herokuapp.com/api/push_notification.json?beacon_id=123")
+      .toPromise().then(
+        data => {
+          cordova.plugins.notification.local.schedule({
+            title: data['titulo'],
+            text: data['mensagem'],
+            foreground: true
+          });
+        }
+      );
   }
 
   private handleBeacon2() {
